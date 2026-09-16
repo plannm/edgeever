@@ -15,9 +15,6 @@ export const CompanionTurnFocusSchema = z.object({
   notebookTitle: z.string().trim().max(160).optional(),
   title: z.string().trim().max(160).optional(),
   selectionMarkdown: z.string().max(2000).optional(),
-  contentMarkdown: z.string().max(4000).optional(),
-  contentTruncated: z.boolean().optional(),
-  diagramKind: z.enum(["mind-map", "flowchart", "architecture"]).optional(),
 }).strict();
 export const CompanionTurnInputSchema = z.object({
   id: CompanionIdSchema,

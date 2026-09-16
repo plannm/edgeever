@@ -986,7 +986,6 @@ export const ja = {
     openForSelection: "AI に依頼",
     actionLabel: "操作",
     selectedScope: "選択したテキスト",
-    workspaceScope: "すべてのノート",
     noteScope: "ノート全体",
     noteScopeHint: "AI は現在のノートをコンテキストとして使います。",
     selectedActions: "選択したテキストを編集",

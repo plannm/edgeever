@@ -5,23 +5,17 @@ const MEMO_LINK_PREFIX = "#memo=";
 export const createMemoLinkHref = (memoId: string): string => `${MEMO_LINK_PREFIX}${encodeURIComponent(memoId)}`;
 
 export const parseMemoLinkHref = (href: unknown): string | null => {
-  if (typeof href !== "string" || !href) {
+  if (typeof href !== "string" || !href.startsWith(MEMO_LINK_PREFIX)) {
     return null;
   }
 
-  const hash = href.includes("#") ? href.slice(href.lastIndexOf("#")) : href;
-  if (!hash.startsWith(MEMO_LINK_PREFIX)) {
-    return null;
-  }
-
-  const encoded = hash.slice(MEMO_LINK_PREFIX.length);
-  if (!encoded) {
+  const memoId = href.slice(MEMO_LINK_PREFIX.length);
+  if (!memoId) {
     return null;
   }
 
   try {
-    const memoId = decodeURIComponent(encoded);
-    return /^[0-9a-f]{32}$/i.test(memoId) ? `memo_${memoId}` : memoId;
+    return decodeURIComponent(memoId);
   } catch {
     return null;
   }

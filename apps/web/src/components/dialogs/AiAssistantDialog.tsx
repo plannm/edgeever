@@ -64,7 +64,6 @@ import {
   type TargetLanguage,
 } from "@/lib/ai-assistant";
 import { CompanionChat } from "@/components/CompanionChat";
-import { parseDiagramDocument } from "@edgeever/shared";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import {
   clampFloatingPanelPosition,
@@ -622,7 +621,6 @@ export const AiAssistantDialog = ({
   }, [handleDragEnd, handleDragMove, open]);
 
   const chatting = mode === "ask";
-  const openDiagram = useMemo(() => parseDiagramDocument(contentMarkdown), [contentMarkdown]);
   const selectMode = (next: AiAssistantMode) => {
     setMode(next);
     writeStoredAiAssistantMode(next);
@@ -674,11 +672,9 @@ export const AiAssistantDialog = ({
               <Sparkles className="h-5 w-5 shrink-0 text-emerald-600" />
               <span className="truncate text-sm font-semibold text-slate-950">{t("aiAssistant.title")}</span>
               <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">
-                {t(chatting
-                  ? "aiAssistant.workspaceScope"
-                  : usesComposerAsSource
-                    ? "aiAssistant.inputScope"
-                    : hasSelection ? "aiAssistant.selectedScope" : "aiAssistant.noteScope")}
+                {t(usesComposerAsSource
+                  ? "aiAssistant.inputScope"
+                  : hasSelection ? "aiAssistant.selectedScope" : "aiAssistant.noteScope")}
               </span>
               <GripHorizontal aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 text-slate-300" />
             </div>
@@ -706,21 +702,7 @@ export const AiAssistantDialog = ({
           {chatting ? (
             <CompanionChat
               available={companionAvailable}
-              focus={{
-                memoId,
-                notebookId,
-                notebookTitle,
-                title,
-                selectionMarkdown,
-                ...(openDiagram
-                  ? { diagramKind: openDiagram.kind }
-                  : contentMarkdown.trim()
-                    ? {
-                      contentMarkdown: contentMarkdown.trim().slice(0, 4000),
-                      ...(contentMarkdown.trim().length > 4000 ? { contentTruncated: true } : {}),
-                    }
-                    : {}),
-              }}
+              focus={{ memoId, notebookId, notebookTitle, title, selectionMarkdown }}
               placeholder={t("aiAssistant.modes.askPlaceholder")}
               beforeApply={beforeCompanionApply ?? (async () => undefined)}
               onNotesChanged={onCompanionNotesChanged ?? (async () => undefined)}

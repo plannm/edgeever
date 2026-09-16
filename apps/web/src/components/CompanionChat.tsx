@@ -14,9 +14,6 @@ export type CompanionChatFocus = {
   notebookTitle?: string;
   title?: string;
   selectionMarkdown?: string | null;
-  contentMarkdown?: string | null;
-  contentTruncated?: boolean;
-  diagramKind?: "mind-map" | "flowchart" | "architecture";
 };
 
 type CompanionChatProps = {
@@ -111,20 +108,13 @@ export function CompanionChat({
         allowNotes: true,
         allowWrites: true,
         locale: companionLocale(i18n.resolvedLanguage),
-        ...(focus?.memoId || focus?.selectionMarkdown?.trim() || focus?.contentMarkdown?.trim() || focus?.diagramKind
+        ...(focus?.memoId || focus?.selectionMarkdown?.trim()
           ? { focus: {
             ...(focus.memoId ? { memoId: focus.memoId } : {}),
             ...(focus.notebookId ? { notebookId: focus.notebookId } : {}),
             ...(focus.notebookTitle ? { notebookTitle: focus.notebookTitle } : {}),
             ...(focus.title ? { title: focus.title } : {}),
             ...(focus.selectionMarkdown?.trim() ? { selectionMarkdown: focus.selectionMarkdown.trim().slice(0, 2000) } : {}),
-            ...(focus.diagramKind ? { diagramKind: focus.diagramKind } : {}),
-            ...(!focus.diagramKind && focus.contentMarkdown?.trim()
-              ? {
-                contentMarkdown: focus.contentMarkdown.trim().slice(0, 4000),
-                ...(focus.contentTruncated ? { contentTruncated: true } : {}),
-              }
-              : {}),
           } }
           : {}),
       };

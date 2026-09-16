@@ -94,7 +94,5 @@ describe("MCP tool catalog", () => {
       destructiveHint: false,
       idempotentHint: true,
     });
-    expect(byName.get("search_memos")?.inputSchema.properties.createdAfter.format).toBeUndefined();
-    expect(byName.get("search_memos")?.description).toContain("createdAfter");
   });
 });

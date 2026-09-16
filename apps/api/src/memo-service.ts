@@ -141,20 +141,6 @@ export const getCurrentWorkspaceIdentity = async (db: DatabaseAdapter, auth: Aut
   };
 };
 
-const DATE_ONLY_TIME_BOUND = /^\d{4}-\d{2}-\d{2}$/;
-
-export const normalizeSearchTimeBound = (value: string | null | undefined, bound: "after" | "before"): string | null => {
-  const raw = value?.trim();
-  if (!raw) return null;
-  const expanded = DATE_ONLY_TIME_BOUND.test(raw)
-    ? bound === "after" ? `${raw}T00:00:00.000Z` : `${raw}T23:59:59.999Z`
-    : raw;
-  if (Number.isNaN(Date.parse(expanded))) {
-    throw new AppError("invalid_params", "Time range must be an ISO 8601 date or date-time.", 400);
-  }
-  return expanded;
-};
-
 export const searchMemoSummaries = async (
   db: DatabaseAdapter,
   options: {
@@ -177,10 +163,6 @@ export const searchMemoSummaries = async (
   const limit = clampNumber(options.limit, 1, 100);
   const filters = ["m.workspace_id = ?", "m.is_deleted = 0"];
   const binds: unknown[] = [options.workspaceId];
-  const createdAfter = normalizeSearchTimeBound(options.createdAfter, "after");
-  const createdBefore = normalizeSearchTimeBound(options.createdBefore, "before");
-  const updatedAfter = normalizeSearchTimeBound(options.updatedAfter, "after");
-  const updatedBefore = normalizeSearchTimeBound(options.updatedBefore, "before");
 
   if (notebookId) {
     filters.push("m.notebook_id = ?");
@@ -192,24 +174,24 @@ export const searchMemoSummaries = async (
     binds.push(options.workspaceId, tag);
   }
 
-  if (createdAfter) {
+  if (options.createdAfter) {
     filters.push("m.created_at >= ?");
-    binds.push(createdAfter);
+    binds.push(options.createdAfter);
   }
 
-  if (createdBefore) {
+  if (options.createdBefore) {
     filters.push("m.created_at <= ?");
-    binds.push(createdBefore);
+    binds.push(options.createdBefore);
   }
 
-  if (updatedAfter) {
+  if (options.updatedAfter) {
     filters.push("m.updated_at >= ?");
-    binds.push(updatedAfter);
+    binds.push(options.updatedAfter);
   }
 
-  if (updatedBefore) {
+  if (options.updatedBefore) {
     filters.push("m.updated_at <= ?");
-    binds.push(updatedBefore);
+    binds.push(options.updatedBefore);
   }
 
   if (options.isPinned !== null && options.isPinned !== undefined) {

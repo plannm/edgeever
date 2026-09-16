@@ -124,16 +124,12 @@ describe("screenshot note content", () => {
 });
 
 describe("screenshot import gate", () => {
-  test("prefers a capture id and otherwise keys by title and filename", () => {
-    expect(screenshotImportDedupeKey({
-      captureId: "shot-1",
-      name: "screenshot-20260915-222604.png",
-      title: "截图 2026-09-15 22:26",
-    })).toBe("shot-1");
+  test("builds a stable key from the title, filename, and byte length", () => {
     expect(screenshotImportDedupeKey({
       name: "screenshot-20260915-222604.png",
       title: "截图 2026-09-15 22:26",
-    })).toBe(["截图 2026-09-15 22:26", "screenshot-20260915-222604.png"].join("\u0000"));
+      bytes: new Uint8Array(4),
+    })).toBe(["截图 2026-09-15 22:26", "screenshot-20260915-222604.png", "4"].join("\u0000"));
   });
 
   test("drops a second import while the first screenshot is still being saved", () => {
@@ -149,14 +145,14 @@ describe("screenshot import gate", () => {
     gate.finish("a", 0);
     expect(gate.tryBegin("a", 500)).toBe(false);
     expect(gate.tryBegin("b", 500)).toBe(true);
-    gate.fail();
+    gate.fail("b");
     expect(gate.tryBegin("a", 1500)).toBe(true);
   });
 
   test("allows a retry after a failed import", () => {
     const gate = createScreenshotImportGate(1000);
     expect(gate.tryBegin("a")).toBe(true);
-    gate.fail();
+    gate.fail("a");
     expect(gate.tryBegin("a")).toBe(true);
   });
 });
